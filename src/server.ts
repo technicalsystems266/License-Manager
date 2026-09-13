@@ -777,7 +777,7 @@ export async function handler(req: IncomingMessage, res: ServerResponse) {
         signingConfigured,
       });
     }
-    if (path === "/api/license/public-key") {
+    if (path === "/api/v1/license/public-key") {
       try {
         const key = publicPem();
         return key ? text(res, 200, key) : json(res, 503, { error: "Entitlement signing is not configured", code: "SIGNING_KEY_MISSING" });
@@ -785,15 +785,15 @@ export async function handler(req: IncomingMessage, res: ServerResponse) {
         return json(res, 503, { error: "Entitlement signing key is invalid", code: "SIGNING_KEY_INVALID" });
       }
     }
-    if (path === "/api/license/revision") return json(res, 200, { service: "OrbitFS License Master", version: "2.0.0", authority: "master", components: COMPONENTS });
-    if (path === "/api/products" && req.method === "GET") return products(req, res);
-    if (path === "/api/settings" && req.method === "GET") return settings(req, res);
+    if (path === "/api/v1/license/revision") return json(res, 200, { service: "OrbitFS License Master", version: "2.0.0", authority: "master", components: COMPONENTS });
+    if (path === "/api/v1/products" && req.method === "GET") return products(req, res);
+    if (path === "/api/v1/settings" && req.method === "GET") return settings(req, res);
     const installationMatch = path.match(/^\/api\/v1\/installations(?:\/([^/]+))?$/);
     if (installationMatch) return installations(req, res, installationMatch[1] ? decodeURIComponent(installationMatch[1]) : undefined);
-    if (path === "/api/license/validate" && req.method === "POST") return validate(req, res);
-    if (path === "/api/license/issue" && req.method === "POST") return issue(req, res);
+    if (path === "/api/v1/license/validate" && req.method === "POST") return validate(req, res);
+    if (path === "/api/v1/license/issue" && req.method === "POST") return issue(req, res);
     if (path === "/api/admin/licenses/issue" && req.method === "POST") return adminIssue(req, res);
-    if (path === "/api/licenses" && req.method === "GET") {
+    if (path === "/api/v1/licenses" && req.method === "GET") {
       if (!allowed(req, ["master", "billing"])) return json(res, 401, { error: "Unauthorized" });
       return json(res, 200, { licenses: (await query<JsonObject>("select * from license_bindings where archived_at is null order by created_at desc limit 500")).rows.map(publicBinding) });
     }
@@ -815,16 +815,16 @@ export async function handler(req: IncomingMessage, res: ServerResponse) {
     if (adminControlMatch && req.method === "POST") return adminControl(req, res, decodeURIComponent(adminControlMatch[1]));
     const licenseControlMatch = path.match(/^\/api\/v1\/license\/([^/]+)\/control$/);
     if (licenseControlMatch && req.method === "POST") return control(req, res, decodeURIComponent(licenseControlMatch[1]));
-    if (path === "/api/releases" && (req.method === "GET" || req.method === "POST")) return releases(req, res);
+    if (path === "/api/v1/releases" && (req.method === "GET" || req.method === "POST")) return releases(req, res);
     const releaseMatch = path.match(/^\/api\/v1\/releases\/([^/]+)\/(artifact|validate|publish|pause|paused|withdraw|withdrawn|control)$/);
     if (releaseMatch && req.method === "POST") {
       const action = releaseMatch[2] === "artifact" ? null : releaseMatch[2] === "control" ? String((await body(req)).action || "") : releaseMatch[2];
       if (releaseMatch[2] === "artifact") return artifact(req, res, decodeURIComponent(releaseMatch[1]));
       return releaseAction(req, res, decodeURIComponent(releaseMatch[1]), action || "");
     }
-    if (path === "/api/releases/latest" && req.method === "GET") return latest(req, res);
-    if (path === "/api/deployments/execute" && req.method === "POST") return executeDeployment(req, res);
-    if (path === "/api/deployments/sync" && req.method === "POST") return syncDeployment(req, res);
+    if (path === "/api/v1/releases/latest" && req.method === "GET") return latest(req, res);
+    if (path === "/api/v1/deployments/execute" && req.method === "POST") return executeDeployment(req, res);
+    if (path === "/api/v1/deployments/sync" && req.method === "POST") return syncDeployment(req, res);
     const deploymentMatch = path.match(/^\/api\/v1\/deployments(?:\/([^/]+))?$/);
     if (deploymentMatch) return deployments(req, res, deploymentMatch[1] ? decodeURIComponent(deploymentMatch[1]) : undefined);
     return json(res, 404, { error: "Not found" });

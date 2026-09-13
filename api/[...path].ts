@@ -10,7 +10,7 @@ export default async function api(req: IncomingMessage, res: ServerResponse) {
       const html = readFileSync(new URL("../web/admin-control.html", import.meta.url), "utf8");
       res.statusCode = 200;res.setHeader("content-type", "text/html; charset=utf-8");res.setHeader("cache-control", "no-store, max-age=0");return res.end(html);
     }
-    if (pathname === "/api/products") {
+    if (pathname === "/api/products" || pathname === "/api/v1/products") {
       const { default: products } = await import("./products.js");
       return products(req, res);
     }
@@ -21,9 +21,10 @@ export default async function api(req: IncomingMessage, res: ServerResponse) {
       const { default: adminExtended } = await import("./admin-extended.js");
       return adminExtended(req, res);
     }
-    const canonical = pathname;
-    const legacy = canonical.replace(/^\/api\/(license|releases|installations|deployments|settings)(?=\/|$)/, "/api/$1");
-    if (legacy !== canonical) req.url = legacy + (rawPath.includes("?") ? rawPath.slice(rawPath.indexOf("?")) : "");
+    if (pathname === "/api/admin-settings" || pathname === "/api/admin-settings") {
+  const { default: adminSettings } = await import("./admin-settings.js");
+  return adminSettings(req, res);
+    }
     const { handler } = await import("../src/server.js");
     return handler(req, res);
   } catch (error) {
