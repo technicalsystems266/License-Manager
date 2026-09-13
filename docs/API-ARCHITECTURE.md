@@ -64,17 +64,17 @@ Base URL in production:
 
 Canonical versioned License API prefix:
 
-`/api/license/v1`
+`/api/license`
 
 ### Public/runtime
 
-- `GET /api/license/v1/health`
-- `POST /api/license/v1/register`
-- `POST /api/license/v1/activate`
-- `POST /api/license/v1/validate`
-- `GET /api/license/v1/revision`
-- `GET /api/license/v1/releases`
-- `GET /api/license/v1/releases/:releaseId`
+- `GET /api/license/health`
+- `POST /api/license/register`
+- `POST /api/license/activate`
+- `POST /api/license/validate`
+- `GET /api/license/revision`
+- `GET /api/license/releases`
+- `GET /api/license/releases/:releaseId`
 
 Runtime endpoints return only the information required by the authenticated customer installation. License keys are never returned after initial issuance except through an explicitly authorised delivery operation.
 

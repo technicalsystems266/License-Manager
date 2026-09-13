@@ -76,19 +76,19 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   const url = new URL(req.url || "/", "http://localhost"); const action = url.searchParams.get("action") || ""; const id = url.searchParams.get("id") || "";
   try {
     if (action === "settings") return settingsAction(req, res);
-    if (action === "health") return json(res, 200, { ok: true, database: true, settings_found: true, settings: await getSettingsForHealth(), api: "License Master V2", services: { billing: Boolean(BILLING), deployer: Boolean(DEPLOYER) }, endpoints: { base: "/api", versioned: "/api/v1", billing: { products: "/api/v1/products", issue: "/api/v1/license/issue", validate: "/api/v1/license/validate", releases: "/api/v1/releases" }, deployer: { releases: "/api/v1/releases", installations: "/api/v1/installations", deployments: "/api/v1/deployments", execute: "/api/v1/deployments/execute", sync: "/api/v1/deployments/sync" }, updater: { releases: "/api/v1/releases", revision: "/api/v1/license/revision" } } });
+    if (action === "health") return json(res, 200, { ok: true, database: true, settings_found: true, settings: await getSettingsForHealth(), api: "License Master V2", services: { billing: Boolean(BILLING), deployer: Boolean(DEPLOYER) }, endpoints: { base: "/api", billing: { products: "/api/products", issue: "/api/license/issue", validate: "/api/license/validate", releases: "/api/releases" }, deployer: { releases: "/api/releases", installations: "/api/installations", deployments: "/api/deployments", execute: "/api/deployments/execute", sync: "/api/deployments/sync" }, updater: { releases: "/api/releases", revision: "/api/license/revision" } } });
     if (action === "releaseSource") { const kind = String(req.headers["x-release-kind"] || url.searchParams.get("kind") || "update").toLowerCase() === "base" ? "base" : "update"; return json(res, 200, { source: await releaseSource(kind) }); }
-    if (action === "products") return proxy(req, res, "/api/v1/products");
-    if (action === "releases" || action === "releaseCreate") return proxy(req, res, "/api/v1/releases");
-    if (action === "releasePublish") return proxy(req, res, `/api/v1/releases/${encodeURIComponent(id)}/publish`);
-    if (action === "releaseValidate") return proxy(req, res, `/api/v1/releases/${encodeURIComponent(id)}/validate`);
-    if (action === "releasePause") return proxy(req, res, `/api/v1/releases/${encodeURIComponent(id)}/pause`);
-    if (action === "releaseWithdraw") return proxy(req, res, `/api/v1/releases/${encodeURIComponent(id)}/withdraw`);
-    if (action === "deployments") return proxy(req, res, "/api/v1/deployments");
-    if (action === "installations") return proxy(req, res, "/api/v1/installations");
-    if (action === "licenseIssue") return proxy(req, res, "/api/v1/license/issue");
-    if (action === "executeDeployment") return proxy(req, res, "/api/v1/deployments/execute");
-    if (action === "syncDeployment") return proxy(req, res, "/api/v1/deployments/sync");
+    if (action === "products") return proxy(req, res, "/api/products");
+    if (action === "releases" || action === "releaseCreate") return proxy(req, res, "/api/releases");
+    if (action === "releasePublish") return proxy(req, res, `/api/releases/${encodeURIComponent(id)}/publish`);
+    if (action === "releaseValidate") return proxy(req, res, `/api/releases/${encodeURIComponent(id)}/validate`);
+    if (action === "releasePause") return proxy(req, res, `/api/releases/${encodeURIComponent(id)}/pause`);
+    if (action === "releaseWithdraw") return proxy(req, res, `/api/releases/${encodeURIComponent(id)}/withdraw`);
+    if (action === "deployments") return proxy(req, res, "/api/deployments");
+    if (action === "installations") return proxy(req, res, "/api/installations");
+    if (action === "licenseIssue") return proxy(req, res, "/api/license/issue");
+    if (action === "executeDeployment") return proxy(req, res, "/api/deployments/execute");
+    if (action === "syncDeployment") return proxy(req, res, "/api/deployments/sync");
     return json(res, 400, { error: "Unknown admin action" });
   } catch (e) { return json(res, 503, { ok: false, database: false, settings_found: false, error: e instanceof Error ? e.message : "License Master API operation failed" }); }
 }

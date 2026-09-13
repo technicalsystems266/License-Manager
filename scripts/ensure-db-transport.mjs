@@ -20,22 +20,16 @@ const helper = [
   '  }',
   '};',
   '',
-].join("\n");
+].join("\\n");
 
 const patch = (path, marker, replacement) => {
   let source = readFileSync(path, "utf8");
-  if (source.includes("const normalizeDatabaseUrl = (value) =>")) {
-    if (source.includes(marker)) source = source.replace(marker, replacement, 1);
-    writeFileSync(path, source);
-    return;
+  if (!source.includes("const normalizeDatabaseUrl = (value) =>")) {
+    if (!source.includes(marker)) throw new Error(`${path}: database marker not found`);
+    source = source.replace(marker, helper + replacement, 1);
+  } else if (source.includes(marker)) {
+    source = source.replace(marker, replacement, 1);
   }
-  if (!source.includes(marker)) {
-    // This file may already use a different database transport (for example
-    // Supabase REST). It does not need the pg/DATABASE_URL transport patch.
-    console.log(`Skipping DB transport patch for ${path}: marker not present`);
-    return;
-  }
-  source = source.replace(marker, helper + replacement, 1);
   writeFileSync(path, source);
 };
 

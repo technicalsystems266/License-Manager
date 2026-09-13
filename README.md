@@ -17,16 +17,16 @@ See [`docs/CONTROL-PLANE.md`](docs/CONTROL-PLANE.md) for the full system boundar
 
 ## Production API
 - Base URL: `https://incendiarynetworks.cc`
-- Versioned API: `https://incendiarynetworks.cc/api/v1`
+- API base: `https://incendiarynetworks.cc/api`
 - License Master is the central authority for licence/product/install/release eligibility.
 
 ## Licence API
-- `POST /api/v1/license/issue` — idempotent issuance by order reference.
-- `POST /api/v1/license/validate` — runtime validation and signed entitlement.
-- `GET /api/v1/licenses` — Master/billing administration list.
-- `POST /api/v1/license/:id/control` — activate, suspend, terminate, unlock, component and expiry controls.
-- `GET /api/v1/license/public-key` — runtime verification key.
-- `GET /api/v1/license/revision` — Master authority revision.
+- `POST /api/license/issue` — idempotent issuance by order reference.
+- `POST /api/license/validate` — runtime validation and signed entitlement.
+- `GET /api/licenses` — Master/billing administration list.
+- `POST /api/license/:id/control` — activate, suspend, terminate, unlock, component and expiry controls.
+- `GET /api/license/public-key` — runtime verification key.
+- `GET /api/license/revision` — Master authority revision.
 - `GET /health` — liveness and dependency diagnostics.
 - `GET /ready` — readiness check (database and entitlement signing key).
 - `GET /admin` — administrator console (Supabase Auth email/password).
@@ -44,21 +44,21 @@ Product metadata can define runtime, Engine requirement, installation limits, re
 ## Release API
 Lifecycle is `draft -> validated -> published`, with pause and withdrawal controls.
 
-- `GET/POST /api/v1/releases` — release discovery/creation.
-- `POST /api/v1/releases/:id/artifact` — artifact upload with SHA-256 verification.
-- `POST /api/v1/releases/:id/validate` — validation gate.
-- `POST /api/v1/releases/:id/publish` — publish only after validation.
-- `POST /api/v1/releases/:id/control` — pause or withdraw.
-- `GET /api/v1/releases/latest` — latest published release and short-lived artifact URL.
+- `GET/POST /api/releases` — release discovery/creation.
+- `POST /api/releases/:id/artifact` — artifact upload with SHA-256 verification.
+- `POST /api/releases/:id/validate` — validation gate.
+- `POST /api/releases/:id/publish` — publish only after validation.
+- `POST /api/releases/:id/control` — pause or withdraw.
+- `GET /api/releases/latest` — latest published release and short-lived artifact URL.
 
 Publishing never deploys automatically. A published release becomes eligible for authenticated Billing Store/customer presentation. The customer explicitly chooses **Deploy Update**.
 
 ## Deployment/update API
-- `POST /api/v1/deployments` — queue an update/deployment for a licensed installation.
-- `GET /api/v1/deployments` — deployment queue/history.
-- `GET /api/v1/deployments/:id` — job status.
-- `POST /api/v1/deployments/execute` — submit/execute a deployment operation through the configured deployment service.
-- `POST /api/v1/deployments/sync` — synchronize deployment state.
+- `POST /api/deployments` — queue an update/deployment for a licensed installation.
+- `GET /api/deployments` — deployment queue/history.
+- `GET /api/deployments/:id` — job status.
+- `POST /api/deployments/execute` — submit/execute a deployment operation through the configured deployment service.
+- `POST /api/deployments/sync` — synchronize deployment state.
 
 Normal updates use an in-place strategy. They preserve the customer's existing Vercel project and Supabase data; they are not clean reinstalls. Deployment records retain previous/target versions and provider deployment references so failures can be recovered or rolled back.
 
@@ -107,4 +107,4 @@ For Vercel Hobby, keep request work bounded: the included configuration uses the
 4. Open `/health`, then `/ready`. Health should be HTTP 200 and reports database, signing, API-token, and admin-auth configuration without exposing secrets. Readiness becomes HTTP 200 only after the database, signing key, and all three Master API tokens are available.
 5. Open `/admin`, sign in with the Supabase administrator account, and use the configuration status table before managing licences/releases/deployments.
 
-The admin panel can inspect service status and manage licenses, products, releases, installations, and deployments, but it intentionally cannot edit API secrets. Configure those only in Vercel Environment Variables so database credentials, bearer tokens, provider credentials, and the entitlement private key never reach browser storage or page JavaScript. The public entitlement key is available at `/api/v1/license/public-key`.
+The admin panel can inspect service status and manage licenses, products, releases, installations, and deployments, but it intentionally cannot edit API secrets. Configure those only in Vercel Environment Variables so database credentials, bearer tokens, provider credentials, and the entitlement private key never reach browser storage or page JavaScript. The public entitlement key is available at `/api/license/public-key`.
