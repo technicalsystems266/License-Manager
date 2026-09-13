@@ -21,7 +21,7 @@ export default async function api(req: IncomingMessage, res: ServerResponse) {
       const { default: adminExtended } = await import("./admin-extended.js");
       return adminExtended(req, res);
     }
-    if (pathname === "/api/admin-settings" || pathname === "/api/v1/admin-settings") {
+    if (pathname === "/api/admin-settings" || pathname === "/api/admin-settings") {
   const { default: adminSettings } = await import("./admin-settings.js");
   return adminSettings(req, res);
     }
